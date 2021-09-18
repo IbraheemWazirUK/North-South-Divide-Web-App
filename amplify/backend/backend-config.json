@@ -1,6 +1,6 @@
 {
   "auth": {
-    "northernsocietymap89d733b2": {
+    "northernsocietymap8234e1e6": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
