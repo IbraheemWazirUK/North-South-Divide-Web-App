@@ -1,0 +1,15 @@
+{
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-northernsocietymap-prod-151918-authRole",
+      "UnauthRoleArn": "arn:aws:iam::838798956729:role/amplify-northernsocietymap-prod-151918-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::838798956729:role/amplify-northernsocietymap-prod-151918-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-northernsocietymap-prod-151918-deployment",
+      "UnauthRoleName": "amplify-northernsocietymap-prod-151918-unauthRole",
+      "StackName": "amplify-northernsocietymap-prod-151918",
+      "StackId": "arn:aws:cloudformation:eu-west-2:838798956729:stack/amplify-northernsocietymap-prod-151918/6a6aaee0-188b-11ec-9c2a-02c50e1d0d5a",
+      "AmplifyAppId": "d2pq4edpio42wp"
+    }
+  }
+}
