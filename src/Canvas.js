@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import Message from './Message';
+import ClearButton from './ClearButton';
 import map from './assets/map.png';
 
 const Canvas = (props) => {
@@ -13,6 +14,7 @@ const Canvas = (props) => {
     const [ysProp, setYsProp] = useState([]);
     const enteredLand = useRef(false);
     const [message, setMessage] = useState("");
+    const [temp, setTemp] = useState(0);
 
     const getData = (e) => {
         const canvas = canvasRef.current;
@@ -95,17 +97,27 @@ const Canvas = (props) => {
                 drawingStatus.current = "none";
             }
         }
-        if (drawingStatus.current === "drawn") {
-            setXsProp(xs.current);
-            setYsProp(ys.current);
-        }
         
+    }
+
+    const save = () => {
+        setXsProp(xs.current);
+        setYsProp(ys.current);
     }
 
     const clear = () => {
         const canvas = canvasRef.current;
         const ctx  = canvas.getContext("2d");
         ctx.clearRect(0, 0, 499, 601);    
+    }
+
+    const handleClearButton = () => {
+        clear();
+        drawingStatus.current = "none";
+        xs.current = [];
+        ys.current = [];
+        setTemp(1 - temp);
+
     }
 
     useEffect(() => {
@@ -126,6 +138,7 @@ const Canvas = (props) => {
 
     return (
         <div>
+            <ClearButton clear = {handleClearButton} />
             <Message message = { message }/>
             <canvas ref={canvasRef} {...props} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
             </canvas>
