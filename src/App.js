@@ -44,6 +44,20 @@ class App extends React.Component {
         }
     }
 
+    async handleDeleteData() {
+        const response = await axios.delete('https://l6m6isx62e.execute-api.eu-west-2.amazonaws.com/prod/drawing', {
+            headers: {
+                authorization: this.state.token
+            }
+        });
+
+        if (response && response.data && response.data.message === "User's drawing deleted from the database.") {
+            this.setState({drawingMissing: true, item: { message: "" } });
+        } else {
+            console.error("Unknown error occurred!");
+        }
+    }
+
     render() {
         return (
             <div className="App">
@@ -58,6 +72,7 @@ class App extends React.Component {
                         :
                         <div>
                             <p><b>Data stored in DB:</b> {this.state.item.message}</p>
+                            <button onClick={this.handleDeleteData.bind(this)}>Delete</button>
                         </div>
                 }
             </div>
