@@ -1,27 +1,39 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
+import axios from "axios";
+import {Auth} from "aws-amplify";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <AmplifySignOut />
-    </div>
-  );
+class App extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {loading: true, drawingMissing: true};
+    }
+
+    componentDidMount() {
+        Auth.currentSession().then(async authConfig => {
+            const result = await axios.get('https://l6m6isx62e.execute-api.eu-west-2.amazonaws.com/prod/drawing', {headers: {authorization: authConfig.getIdToken().getJwtToken()}});
+            if (result && result.data && result.data.message === "User's drawing is not in the database.") {
+                this.setState({loading: false});
+            } else {
+                this.setState({loading: false, drawingMissing: false});
+            }
+        });
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <AmplifySignOut/>
+                {this.state.loading ?
+                    <b>Loading...</b> :
+                    this.state.drawingMissing ?
+                        <b>Drawing is missing</b> : <b>Drawing is present</b>
+                }
+            </div>
+        );
+    }
 }
 
 export default withAuthenticator(App);
