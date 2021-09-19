@@ -5,8 +5,9 @@ import map from './assets/map.png';
 const Canvas = (props) => {
     const isDrawing = useRef(false);
     const canvasRef = useRef(null);
+    const currX = useRef(null);
+    const currY = useRef(null);
     const [message, setMessage] = useState("");
-    const [lines, setLines] = useState([]);
 
     const getData = (e) => {
         const canvas = canvasRef.current;
@@ -17,19 +18,43 @@ const Canvas = (props) => {
         const alpha = ctx.getImageData(x, y, 1, 1).data[3];
         return [x, y, alpha]
     }
+
+    const draw = (prevX, prevY) => {
+        const canvas = canvasRef.current;
+        const ctx  = canvas.getContext("2d");
+        ctx.moveTo(prevX, prevY);
+        ctx.lineTo(currX.current, currY.current);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.closePath();
+    }
     const handleMouseDown = (e) => {
         const data = getData(e);
-        const alpha = data[2];
+        const [x, y, alpha] = data;
         // if user starts from inside the map, tell user to start from outside
-        if (alpha != 0) {
+        if (alpha !== 0) {
             setMessage("You can't start drawing the line from inside the border");
             return;
         } else {
             isDrawing.current = true;
+            currX.current = x;
+            currY.current = y;
         }
     }
-    const handleMouseMove = () => {
-        console.log("hi");
+    const handleMouseMove = (e) => {
+        if (!isDrawing.current) {
+            return;
+        }
+        const prevX = currX.current;
+        const prevY = currY.current;
+        const data = getData(e);
+        const [x, y, alpha] = data;
+        currX.current = x;
+        currY.current = y;
+        if (alpha !== 0) {
+            draw(prevX, prevY);
+        }
     }
 
     const handleMouseUp = (e) => {
@@ -37,7 +62,7 @@ const Canvas = (props) => {
             const data = getData(e);
             const alpha = data[2];
             // if user ends somewhere inside the map, tell user to end somewhere outside
-            if (alpha != 0) {
+            if (alpha !== 0) {
                 setMessage("You can't end drawing the border somewhere inside the border");
             }
             isDrawing.current = false;
