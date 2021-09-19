@@ -3,10 +3,15 @@ import Message from './Message';
 import map from './assets/map.png';
 
 const Canvas = (props) => {
-    const isDrawing = useRef(false);
+    const drawingStatus = useRef("none");
     const canvasRef = useRef(null);
     const currX = useRef(null);
     const currY = useRef(null);
+    const xs = useRef([]);
+    const ys = useRef([]);
+    const [xsProp, setXsProp] = useState([]);
+    const [ysProp, setYsProp] = useState([]);
+    const enteredLand = useRef(false);
     const [message, setMessage] = useState("");
 
     const getData = (e) => {
@@ -30,20 +35,26 @@ const Canvas = (props) => {
         ctx.closePath();
     }
     const handleMouseDown = (e) => {
-        const data = getData(e);
-        const [x, y, alpha] = data;
-        // if user starts from inside the map, tell user to start from outside
-        if (alpha !== 0) {
-            setMessage("You can't start drawing the line from inside the border");
-            return;
-        } else {
-            isDrawing.current = true;
-            currX.current = x;
-            currY.current = y;
+        if (drawingStatus.current === "none") {
+            const data = getData(e);
+            const [x, y, alpha] = data;
+            // if user starts from inside the map, tell user to start from outside
+            if (alpha !== 0) {
+                setMessage("You can't start drawing the line from inside the border");
+                return;
+            } else {
+                setMessage("");
+                drawingStatus.current = "drawing";
+                enteredLand.current = false;
+                currX.current = x;
+                currY.current = y;
+                xs.current = [x]
+                ys.current = [y]
+            }
         }
     }
     const handleMouseMove = (e) => {
-        if (!isDrawing.current) {
+        if (drawingStatus.current !== "drawing") {
             return;
         }
         const prevX = currX.current;
@@ -53,20 +64,48 @@ const Canvas = (props) => {
         currX.current = x;
         currY.current = y;
         if (alpha !== 0) {
+            enteredLand.current = true;
             draw(prevX, prevY);
+            xs.current = [...xs.current, x];
+            ys.current = [...ys.current, y];
+        } else {
+            if (enteredLand.current) {
+                drawingStatus.current = "drawn";
+            }
         }
     }
 
     const handleMouseUp = (e) => {
-        if (isDrawing.current){
+        if (drawingStatus.current === "drawing") {
             const data = getData(e);
             const alpha = data[2];
             // if user ends somewhere inside the map, tell user to end somewhere outside
             if (alpha !== 0) {
                 setMessage("You can't end drawing the border somewhere inside the border");
+                xs.current = [];
+                ys.current = [];
+                drawingStatus.current = "none";
             }
-            isDrawing.current = false;
         }
+        if (drawingStatus.current === "drawn") {
+            if ((new Set(xs.current)).size !== xs.current.length) {
+                setMessage("The line should have no horizontal turns");
+                xs.current = [];
+                ys.current = [];
+                drawingStatus.current = "none";
+            }
+        }
+        if (drawingStatus.current === "drawn") {
+            setXsProp(xs.current);
+            setYsProp(ys.current);
+        }
+        
+    }
+
+    const clear = () => {
+        const canvas = canvasRef.current;
+        const ctx  = canvas.getContext("2d");
+        ctx.clearRect(0, 0, 499, 601);    
     }
 
     useEffect(() => {
