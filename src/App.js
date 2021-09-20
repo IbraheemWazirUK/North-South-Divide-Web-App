@@ -2,7 +2,7 @@ import './App.css';
 import Canvas from './Canvas'
 
 function App() {
-  const title = "Southerners > Northerners"
+  const title = "North-South Divide"
   return (
     <div className="App">
       <div className="content">

@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Message from './Message';
 import ClearButton from './ClearButton';
+import SaveButton from './SaveButton';
 import map from './assets/map.png';
 
 const Canvas = (props) => {
@@ -10,11 +11,21 @@ const Canvas = (props) => {
     const currY = useRef(null);
     const xs = useRef([]);
     const ys = useRef([]);
-    const [xsProp, setXsProp] = useState([]);
-    const [ysProp, setYsProp] = useState([]);
     const enteredLand = useRef(false);
     const [message, setMessage] = useState("");
     const [temp, setTemp] = useState(0);
+    const buttonStyle = {
+        border: "none",
+        color: "white",
+        padding: "15px 30px",
+        textAlign: "center",
+        textDecoration: "none",
+        display: "inline-block",
+        fontSize: "16px",
+        margin: "10px",
+    };
+    const [buttonColor, setButtonColor] = useState("#839192");
+
 
     const getData = (e) => {
         const canvas = canvasRef.current;
@@ -40,9 +51,11 @@ const Canvas = (props) => {
         if (drawingStatus.current === "none") {
             const data = getData(e);
             const [x, y, alpha] = data;
+            setButtonColor("#F39C12");
             // if user starts from inside the map, tell user to start from outside
             if (alpha !== 0) {
                 setMessage("You can't start drawing the line from inside the border");
+                setButtonColor("#839192");
                 return;
             } else {
                 setMessage("");
@@ -84,6 +97,7 @@ const Canvas = (props) => {
             // if user ends somewhere inside the map, tell user to end somewhere outside
             if (alpha !== 0) {
                 setMessage("You can't end drawing the border somewhere inside the border");
+                setButtonColor("#839192");
                 xs.current = [];
                 ys.current = [];
                 drawingStatus.current = "none";
@@ -92,17 +106,26 @@ const Canvas = (props) => {
         if (drawingStatus.current === "drawn") {
             if ((new Set(xs.current)).size !== xs.current.length) {
                 setMessage("The line should have no horizontal turns");
+                setButtonColor("#839192");
                 xs.current = [];
                 ys.current = [];
                 drawingStatus.current = "none";
             }
-        }
+        } 
+        
         
     }
 
-    const save = () => {
-        setXsProp(xs.current);
-        setYsProp(ys.current);
+    const handleSaveButton = () => {
+        if (drawingStatus.current === "drawn") {
+            // TODO: send xs and ys to db, draw saved line, draw average line
+
+            setButtonColor("#839192");
+            drawingStatus.current = "saved";
+        } 
+
+
+
     }
 
     const clear = () => {
@@ -116,14 +139,16 @@ const Canvas = (props) => {
         drawingStatus.current = "none";
         xs.current = [];
         ys.current = [];
+        setButtonColor("#839192");
         setTemp(1 - temp);
-
     }
+
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx  = canvas.getContext("2d");
-        const scaleFactor = 0.95;
+        const scaleFactor = 1;
         const width = 499;
         const height = 601;
         canvas.width = width*scaleFactor;
@@ -138,7 +163,8 @@ const Canvas = (props) => {
 
     return (
         <div>
-            <ClearButton clear = {handleClearButton} />
+            <ClearButton clear = {handleClearButton} buttonStyle={buttonStyle} buttonColor={buttonColor} />
+            <SaveButton save = {handleSaveButton} buttonStyle={buttonStyle} buttonColor={buttonColor} />
             <Message message = { message }/>
             <canvas ref={canvasRef} {...props} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
             </canvas>
