@@ -1,4 +1,5 @@
 import React from 'react';
+import Canvas from './Canvas'
 import './App.css';
 import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
 import axios from "axios";
@@ -75,6 +76,7 @@ class App extends React.Component {
                             <button onClick={this.handleDeleteData.bind(this)}>Delete</button>
                         </div>
                 }
+                <Canvas />
             </div>
         );
     }
