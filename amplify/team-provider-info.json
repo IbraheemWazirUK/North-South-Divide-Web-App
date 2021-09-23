@@ -10,11 +10,6 @@
       "StackName": "amplify-northernsocietymap-prod-202231",
       "StackId": "arn:aws:cloudformation:eu-west-2:838798956729:stack/amplify-northernsocietymap-prod-202231/c65502d0-18b5-11ec-9c2a-02c50e1d0d5a",
       "AmplifyAppId": "d1zds8wb5mum6k"
-    },
-    "categories": {
-      "auth": {
-        "northernsocietymap8234e1e6": {}
-      }
     }
   }
 }

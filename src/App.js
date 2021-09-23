@@ -1,9 +1,6 @@
 import React from 'react';
-import Canvas from './Canvas'
 import './App.css';
-import {AmplifySignOut, withAuthenticator} from '@aws-amplify/ui-react';
 import axios from "axios";
-import {Auth} from "aws-amplify";
 
 class App extends React.Component {
 
@@ -12,18 +9,16 @@ class App extends React.Component {
         this.state = {loading: true, drawingMissing: true, item: {message: ""}, token: "" };
     }
 
-    componentDidMount() {
-        Auth.currentSession().then(async authConfig => {
-            const token = authConfig.getIdToken().getJwtToken();
-            const result = await axios.get('https://l6m6isx62e.execute-api.eu-west-2.amazonaws.com/prod/drawing', {headers: {authorization: token}});
+    async componentDidMount() {
+        const deviceId = "test";
+        const result = await axios.post('https://l6m6isx62e.execute-api.eu-west-2.amazonaws.com/prod/fetchDrawing', {deviceId: deviceId});
 
-            if (result && result.data && result.data.message === "User's drawing is not in the database.") {
-                this.setState({loading: false, token});
-            } else {
-                const parsedData = JSON.parse(result.data.data);
-                this.setState({loading: false, drawingMissing: false, token, item: parsedData});
-            }
-        });
+        console.log(result);
+        if (result && result.data && result.data.message === "User's drawing is not in the database.") {
+            this.setState({loading: false});
+        } else {
+            this.setState({loading: false, drawingMissing: false});
+        }
     }
 
     handleInputChanged(event) {
@@ -62,24 +57,16 @@ class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <AmplifySignOut/>
                 {this.state.loading ?
                     <b>Loading...</b> :
                     this.state.drawingMissing ?
-                        <div>
-                            <input type="text" onChange={this.handleInputChanged.bind(this)} />
-                            <button onClick={this.handleDatabaseSave.bind(this)}>Save</button>
-                        </div>
+                        <p>Drawing is not in the database.</p>
                         :
-                        <div>
-                            <p><b>Data stored in DB:</b> {this.state.item.message}</p>
-                            <button onClick={this.handleDeleteData.bind(this)}>Delete</button>
-                        </div>
+                        <p>Drawing is in the database.</p>
                 }
-                <Canvas />
             </div>
         );
     }
 }
 
-export default withAuthenticator(App);
+export default App;
